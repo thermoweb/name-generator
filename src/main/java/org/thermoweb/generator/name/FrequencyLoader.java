@@ -1,15 +1,19 @@
 package org.thermoweb.generator.name;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.thermoweb.generator.name.commands.NameGeneratorCommand;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,9 +27,9 @@ public class FrequencyLoader {
 
     }
 
-    static List<FirstnameData> loadFirstnames(String firstnameFile) {
+    public static List<FirstnameData> loadFirstnames(InputStream firstnameFile) {
         List<FirstnameData> firstnames = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(firstnameFile))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(firstnameFile))) {
             String line;
             while ((line = br.readLine()) != null) {
                 addFirstname(firstnames, line);
@@ -36,9 +40,9 @@ public class FrequencyLoader {
         return firstnames;
     }
 
-    static List<String> loadNames(String namesFile) {
+    public static List<String> loadNames(InputStream namesFile) {
         List<String> names = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(namesFile))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(namesFile))) {
             String line;
             while ((line = br.readLine()) != null) {
                 names.add(line.split(COMMA_DELIMITER)[0].toLowerCase());
@@ -87,6 +91,17 @@ public class FrequencyLoader {
             transitions.put(entry.getKey(), randomCollection);
         }
         return transitions;
+    }
+
+    public static Map<String, RandomCollection<String>> getTransitionsMap(Type type, Gender gender, Language language) {
+        if (Type.FIRSTNAME.equals(type)) {
+            return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getFirstnames().stream()
+                    .filter(f -> Optional.ofNullable(gender).map(g -> g.equals(f.gender())).orElse(true)
+                            && language.equals(f.language()))
+                    .map(FirstnameData::firstname));
+        }
+
+        return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getNames().stream());
     }
 
     private static RandomCollection<String> getStringRandomCollection(Map<String, Integer> transitions) {

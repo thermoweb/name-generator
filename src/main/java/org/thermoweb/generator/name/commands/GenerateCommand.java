@@ -1,9 +1,7 @@
 package org.thermoweb.generator.name.commands;
 
 import java.util.Map;
-import java.util.Optional;
 
-import org.thermoweb.generator.name.FirstnameData;
 import org.thermoweb.generator.name.FrequencyLoader;
 import org.thermoweb.generator.name.Gender;
 import org.thermoweb.generator.name.Language;
@@ -36,22 +34,11 @@ public class GenerateCommand implements Runnable {
     @Override
     public void run() {
         log.atInfo().log("Generating {} {} in {}", number, type, language);
-        Map<String, RandomCollection<String>> transitionsMap = getTransitionsMap();
+        Map<String, RandomCollection<String>> transitionsMap = FrequencyLoader.getTransitionsMap(type, gender, language);
 
         for (int i = 0; i < number; i++) {
             String randomFirstname = NameGenerator.generateRandomFirstname(transitionsMap, size);
             log.atInfo().log("generated : {}", randomFirstname);
         }
-    }
-
-    private Map<String, RandomCollection<String>> getTransitionsMap() {
-        if (Type.FIRSTNAME.equals(type)) {
-            return FrequencyLoader.getTransitionMap(NameGenerator.getFirstnames().stream()
-                    .filter(f -> Optional.ofNullable(gender).map(g -> g.equals(f.gender())).orElse(true)
-                            && language.equals(f.language()))
-                    .map(FirstnameData::firstname));
-        }
-
-        return FrequencyLoader.getTransitionMap(NameGenerator.getNames().stream());
     }
 }
