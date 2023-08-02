@@ -15,7 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FrequencyLoader {
-    private static final String COMMA_DELIMITER = ";";
+    private static final String SEMICOLON_DELIMITER = ";";
+    private static final String COMMA_DELIMITER = ",";
     private static final int SLICE_WINDOWS = 3;
 
     private FrequencyLoader() {
@@ -35,15 +36,29 @@ public class FrequencyLoader {
         return firstnames;
     }
 
+    static List<String> loadNames(String namesFile) {
+        List<String> names = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(namesFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                names.add(line.split(COMMA_DELIMITER)[0].toLowerCase());
+            }
+        } catch (IOException e) {
+            log.atWarn().log("oups : {}", e.getMessage());
+        }
+        return names;
+    }
+
     private static void addFirstname(List<FirstnameData> firstnames, String line) {
         try {
-            firstnames.add(new FirstnameData(line.split(COMMA_DELIMITER)));
+            firstnames.add(new FirstnameData(line.split(SEMICOLON_DELIMITER)));
         } catch (IllegalArgumentException e) {
             log.atWarn().log("oups : {}", e.getMessage());
         }
     }
 
     public static Map<String, RandomCollection<String>> getTransitionMap(Stream<String> firstnames) {
+        log.atInfo().log("calculatin transitions map");
         Map<String, Map<String, Integer>> transitionMap = new HashMap<>();
         firstnames.forEach(firstname -> {
             if (firstname.length() <= 2) {

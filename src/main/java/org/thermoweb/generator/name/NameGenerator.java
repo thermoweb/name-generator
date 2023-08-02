@@ -8,6 +8,7 @@ import java.util.random.RandomGenerator;
 
 import org.thermoweb.generator.name.commands.GenerateCommand;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 
@@ -15,7 +16,12 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "ng", subcommands = GenerateCommand.class)
 public class NameGenerator implements Runnable {
     private static final RandomGenerator generator = RandomGenerator.getDefault();
-    public static List<FirstnameData> firstnames = loadFile();
+
+    @Getter
+    private static final List<FirstnameData> firstnames = loadFirstnamesFile();
+
+    @Getter
+    private static final List<String> names = loadNamesFile();
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new NameGenerator())
@@ -30,23 +36,32 @@ public class NameGenerator implements Runnable {
                 .map(FirstnameData::firstname));
 
         for (int i = 0; i < 50; i++) {
-            String randomFirstname = generateRandomFirstname(transitionsMap);
+            String randomFirstname = generateRandomFirstname(transitionsMap, 10);
             log.atInfo().log("generated : {}", randomFirstname);
         }
     }
 
-    private static List<FirstnameData> loadFile() {
+    private static List<FirstnameData> loadFirstnamesFile() {
+        log.atInfo().log("loading firstnames file...");
         String firstnameFile = Optional.ofNullable(NameGenerator.class.getClassLoader().getResource("firstnames.csv"))
                 .map(URL::getFile)
                 .orElseThrow();
         return FrequencyLoader.loadFirstnames(firstnameFile);
     }
 
-    public static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap) {
+    private static List<String> loadNamesFile() {
+        log.atInfo().log("loading names file...");
+        String namesFile = Optional.ofNullable(NameGenerator.class.getClassLoader().getResource("names.csv"))
+                .map(URL::getFile)
+                .orElseThrow();
+        return FrequencyLoader.loadNames(namesFile);
+    }
+
+    public static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap, int length) {
         String firstLetter = getRandomItem(transitionsMap.keySet().stream().filter(s -> s.length() == 1).toList());
         StringBuilder firstname = new StringBuilder(firstLetter);
         RandomCollection<String> getNextProbableLetters;
-        while ((getNextProbableLetters = getGetNextProbableLetters(transitionsMap, firstname)) != null) {
+        while ((getNextProbableLetters = getGetNextProbableLetters(transitionsMap, firstname)) != null && firstname.length() <= length) {
             firstname.append(getNextProbableLetters.next());
         }
 
