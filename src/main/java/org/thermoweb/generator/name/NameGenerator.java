@@ -15,7 +15,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "ng", subcommands = GenerateCommand.class)
 public class NameGenerator implements Runnable {
     private static final RandomGenerator generator = RandomGenerator.getDefault();
-    public static List<FirstnameFileLine> firstnames = loadFile();
+    public static List<FirstnameData> firstnames = loadFile();
 
     public static void main(String[] args) {
         int exitCode = new CommandLine(new NameGenerator())
@@ -27,7 +27,7 @@ public class NameGenerator implements Runnable {
     private static void exemple() {
         Map<String, RandomCollection<String>> transitionsMap = FrequencyLoader.getTransitionMap(firstnames.stream()
                 .filter(f -> f.gender().equals(Gender.MALE) && f.language().equals(Language.FRENCH))
-                .map(FirstnameFileLine::firstname));
+                .map(FirstnameData::firstname));
 
         for (int i = 0; i < 50; i++) {
             String randomFirstname = generateRandomFirstname(transitionsMap);
@@ -35,7 +35,7 @@ public class NameGenerator implements Runnable {
         }
     }
 
-    private static List<FirstnameFileLine> loadFile() {
+    private static List<FirstnameData> loadFile() {
         String firstnameFile = Optional.ofNullable(NameGenerator.class.getClassLoader().getResource("firstnames.csv"))
                 .map(URL::getFile)
                 .orElseThrow();

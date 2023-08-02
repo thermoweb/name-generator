@@ -16,13 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FrequencyLoader {
     private static final String COMMA_DELIMITER = ";";
+    private static final int SLICE_WINDOWS = 3;
 
     private FrequencyLoader() {
 
     }
 
-    static List<FirstnameFileLine> loadFirstnames(String firstnameFile) {
-        List<FirstnameFileLine> firstnames = new ArrayList<>();
+    static List<FirstnameData> loadFirstnames(String firstnameFile) {
+        List<FirstnameData> firstnames = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(firstnameFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -34,9 +35,9 @@ public class FrequencyLoader {
         return firstnames;
     }
 
-    private static void addFirstname(List<FirstnameFileLine> firstnames, String line) {
+    private static void addFirstname(List<FirstnameData> firstnames, String line) {
         try {
-            firstnames.add(new FirstnameFileLine(line.split(COMMA_DELIMITER)));
+            firstnames.add(new FirstnameData(line.split(COMMA_DELIMITER)));
         } catch (IllegalArgumentException e) {
             log.atWarn().log("oups : {}", e.getMessage());
         }
@@ -46,10 +47,10 @@ public class FrequencyLoader {
         Map<String, Map<String, Integer>> transitionMap = new HashMap<>();
         firstnames.forEach(firstname -> {
             if (firstname.length() <= 2) {
-                log.atWarn().log("handle short firstname slicing");
+                log.atDebug().log("handle short firstname slicing");
             } else {
                 for (int i = 1; i < firstname.length(); i++) {
-                    String precedence = firstname.substring(i > 3 ? i - 3 : 0, i);
+                    String precedence = firstname.substring(i > SLICE_WINDOWS ? i - SLICE_WINDOWS : 0, i);
                     String nextLetter = String.valueOf(firstname.charAt(i));
                     transitionMap.merge(precedence, Map.of(nextLetter, 1),
                             (old, recent) -> Stream.of(old, recent)
