@@ -23,6 +23,8 @@ public class FrequencyLoader {
     private static final String COMMA_DELIMITER = ",";
     private static final int SLICE_WINDOWS = 3;
 
+    private static final Map<Integer, Map<String, RandomCollection<String>>> transitionMapCache = new HashMap<>();
+
     private FrequencyLoader() {
 
     }
@@ -94,6 +96,11 @@ public class FrequencyLoader {
     }
 
     public static Map<String, RandomCollection<String>> getTransitionsMap(Type type, Gender gender, Language language) {
+        TransitionKey key = new TransitionKey(type, gender, language);
+        return transitionMapCache.computeIfAbsent(key.hashCode(), s -> getStringRandomCollectionMap(type, gender, language));
+    }
+
+    private static Map<String, RandomCollection<String>> getStringRandomCollectionMap(Type type, Gender gender, Language language) {
         if (Type.FIRSTNAME.equals(type)) {
             return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getFirstnames().stream()
                     .filter(f -> Optional.ofNullable(gender).map(g -> g.equals(f.gender())).orElse(true)
@@ -102,6 +109,10 @@ public class FrequencyLoader {
         }
 
         return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getNames().stream());
+    }
+
+    private record TransitionKey(Type type, Gender gender, Language language) {
+
     }
 
     private static RandomCollection<String> getStringRandomCollection(Map<String, Integer> transitions) {
