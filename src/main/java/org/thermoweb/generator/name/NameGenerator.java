@@ -4,7 +4,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class NameGenerator {
+
+    @Getter
+    private static final List<FirstnameData> firstnames = loadFirstnamesFile();
+
+    @Getter
+    private static final List<String> names = loadNamesFile();
     private static final RandomGenerator generator = RandomGenerator.getDefault();
 
     private NameGenerator() {
@@ -28,5 +38,15 @@ public class NameGenerator {
 
     private static <T> T getRandomItem(List<T> list) {
         return list.get(generator.nextInt(list.size()));
+    }
+
+    private static List<FirstnameData> loadFirstnamesFile() {
+        log.atInfo().log("loading firstnames file...");
+        return FrequencyLoader.loadFirstnames(Thread.currentThread().getContextClassLoader().getResourceAsStream("firstnames.csv"));
+    }
+
+    private static List<String> loadNamesFile() {
+        log.atInfo().log("loading names file...");
+        return FrequencyLoader.loadNames(Thread.currentThread().getContextClassLoader().getResourceAsStream("names.csv"));
     }
 }

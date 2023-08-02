@@ -13,8 +13,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.thermoweb.generator.name.commands.NameGeneratorCommand;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -102,13 +100,13 @@ public class FrequencyLoader {
 
     private static Map<String, RandomCollection<String>> getStringRandomCollectionMap(Type type, Gender gender, Language language) {
         if (Type.FIRSTNAME.equals(type)) {
-            return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getFirstnames().stream()
+            return FrequencyLoader.getTransitionMap(NameGenerator.getFirstnames().stream()
                     .filter(f -> Optional.ofNullable(gender).map(g -> g.equals(f.gender())).orElse(true)
                             && language.equals(f.language()))
                     .map(FirstnameData::firstname));
         }
 
-        return FrequencyLoader.getTransitionMap(NameGeneratorCommand.getNames().stream());
+        return FrequencyLoader.getTransitionMap(NameGenerator.getNames().stream());
     }
 
     private record TransitionKey(Type type, Gender gender, Language language) {
