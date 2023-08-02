@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class FrequencyLoader {
-    private static final RandomGenerator generator = RandomGenerator.getDefault();
-
     private static final String COMMA_DELIMITER = ";";
+
+    private FrequencyLoader() {
+
+    }
 
     static List<FirstnameFileLine> loadFirstnames(String firstnameFile) {
         List<FirstnameFileLine> firstnames = new ArrayList<>();
@@ -41,7 +42,7 @@ public class FrequencyLoader {
         }
     }
 
-    static Map<String, RandomCollection<String>> getTransitionMap(Stream<String> firstnames) {
+    public static Map<String, RandomCollection<String>> getTransitionMap(Stream<String> firstnames) {
         Map<String, Map<String, Integer>> transitionMap = new HashMap<>();
         firstnames.forEach(firstname -> {
             if (firstname.length() <= 2) {

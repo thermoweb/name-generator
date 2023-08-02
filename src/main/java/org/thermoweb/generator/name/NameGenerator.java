@@ -6,18 +6,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
 
+import org.thermoweb.generator.name.commands.GenerateCommand;
+
 import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine;
 
 @Slf4j
-public class NameGenerator {
+@CommandLine.Command(name = "ng", subcommands = GenerateCommand.class)
+public class NameGenerator implements Runnable {
     private static final RandomGenerator generator = RandomGenerator.getDefault();
+    public static List<FirstnameFileLine> firstnames = loadFile();
 
     public static void main(String[] args) {
-        String firstnameFile = Optional.ofNullable(FrequencyLoader.class.getClassLoader().getResource("firstnames.csv"))
-                .map(URL::getFile)
-                .orElseThrow();
-        List<FirstnameFileLine> firstnames = FrequencyLoader.loadFirstnames(firstnameFile);
+        int exitCode = new CommandLine(new NameGenerator())
+                .setCaseInsensitiveEnumValuesAllowed(true)
+                .execute(args);
+        System.exit(exitCode);
+    }
 
+    private static void exemple() {
         Map<String, RandomCollection<String>> transitionsMap = FrequencyLoader.getTransitionMap(firstnames.stream()
                 .filter(f -> f.gender().equals(Gender.MALE) && f.language().equals(Language.FRENCH))
                 .map(FirstnameFileLine::firstname));
@@ -28,7 +35,14 @@ public class NameGenerator {
         }
     }
 
-    private static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap) {
+    private static List<FirstnameFileLine> loadFile() {
+        String firstnameFile = Optional.ofNullable(NameGenerator.class.getClassLoader().getResource("firstnames.csv"))
+                .map(URL::getFile)
+                .orElseThrow();
+        return FrequencyLoader.loadFirstnames(firstnameFile);
+    }
+
+    public static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap) {
         String firstLetter = getRandomItem(transitionsMap.keySet().stream().filter(s -> s.length() == 1).toList());
         StringBuilder firstname = new StringBuilder(firstLetter);
         RandomCollection<String> getNextProbableLetters;
@@ -45,5 +59,10 @@ public class NameGenerator {
 
     public static <T> T getRandomItem(List<T> list) {
         return list.get(generator.nextInt(list.size()));
+    }
+
+    @Override
+    public void run() {
+        log.atInfo().log("ng runned");
     }
 }

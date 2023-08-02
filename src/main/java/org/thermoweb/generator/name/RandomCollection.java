@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RandomCollection<E> {
     private final NavigableMap<Double, E> map = new TreeMap<>();
@@ -43,9 +42,5 @@ public class RandomCollection<E> {
         return Optional.ofNullable(filteredOptions
                 .higherEntry(value))
                 .map(Map.Entry::getValue);
-    }
-
-    public Stream<E> stream() {
-        return map.values().stream();
     }
 }
