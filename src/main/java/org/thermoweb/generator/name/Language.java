@@ -1,5 +1,7 @@
 package org.thermoweb.generator.name;
 
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -12,6 +14,7 @@ public enum Language {
     CROATIAN,
     CZECH,
     DANISH,
+    DUTCH,
     ENGLISH,
     ENGLISH_BIBLICAL("english, biblical"),
     ENGLISH_JEWISH("english, jewish"),
@@ -51,7 +54,7 @@ public enum Language {
 
     public static Language fromCode(String code) {
         for (Language language : values()) {
-            if (language.code.equals(code)) {
+            if (Arrays.stream(code.split(",")).map(String::trim).toList().contains(language.code)) {
                 return language;
             }
         }
