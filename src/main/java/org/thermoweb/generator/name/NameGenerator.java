@@ -1,5 +1,6 @@
 package org.thermoweb.generator.name;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
@@ -17,8 +18,20 @@ public class NameGenerator {
     private static final List<String> names = loadNamesFile();
     private static final RandomGenerator generator = RandomGenerator.getDefault();
 
+    private static final int MAX_LENGTH = 30;
+
     private NameGenerator() {
 
+    }
+
+    public static String getRandomFirstname(Language language) {
+        return getRandomFirstname(language, getRandomItem(Arrays.stream(Gender.values()).toList()));
+    }
+
+    public static String getRandomFirstname(Language language, Gender gender) {
+        Map<String, RandomCollection<String>> transitionsMap = FrequencyLoader.getTransitionsMap(Type.FIRSTNAME, gender, language);
+
+        return generateRandomFirstname(transitionsMap, MAX_LENGTH);
     }
 
     public static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap, int length) {
