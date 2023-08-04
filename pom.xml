@@ -4,7 +4,7 @@
 
     <groupId>org.thermoweb</groupId>
     <artifactId>name-generator</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3-SNAPSHOT</version>
 
     <name>name-generator</name>
     <description>Name generator tool</description>
