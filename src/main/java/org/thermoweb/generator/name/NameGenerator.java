@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.random.RandomGenerator;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,7 +19,8 @@ public class NameGenerator {
     private static final List<String> names = loadNamesFile();
     private static final RandomGenerator generator = RandomGenerator.getDefault();
 
-    private static final int MAX_LENGTH = 30;
+    @Setter
+    private static int maxLength = 30;
 
     private NameGenerator() {
 
@@ -31,7 +33,7 @@ public class NameGenerator {
     public static String getRandomFirstname(Language language, Gender gender) {
         Map<String, RandomCollection<String>> transitionsMap = FrequencyLoader.getTransitionsMap(Type.FIRSTNAME, gender, language);
 
-        return generateRandomFirstname(transitionsMap, MAX_LENGTH);
+        return generateRandomFirstname(transitionsMap, maxLength);
     }
 
     public static String generateRandomFirstname(Map<String, RandomCollection<String>> transitionsMap, int length) {
