@@ -4,7 +4,7 @@
 
     <groupId>org.thermoweb</groupId>
     <artifactId>name-generator</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2.1</version>
 
     <name>name-generator</name>
     <description>Name generator tool</description>
@@ -27,7 +27,7 @@
         <url>https://github.com/thermoweb/name-generator/tree/master</url>
         <connection>scm:git:https://github.com/thermoweb/name-generator.git</connection>
         <developerConnection>scm:git:https://github.com/thermoweb/name-generator.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>name-generator-1.2.1</tag>
   </scm>
 
     <properties>
